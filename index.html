@@ -1,20 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
+    <script src="https://cdn.jsdelivr.net/gh/nextapps-de/flexsearch@0.7.31/dist/flexsearch.bundle.js"></script>
+  </head>
+  <body>
     <div class="search-wrapper">
-        <label for="search"></label>
-        <span class="material-symbols-outlined">
-            search
-            </span>
-        <input class="search" id="search" placeholder="Type in your place here...">
-        <button class="btn">Search</button>
+      <label for="search"></label>
+      <span class="material-symbols-outlined"> search </span>
+      <input
+        class="search"
+        id="search"
+        placeholder="Type in your place here..."
+      />
+
+      <button class="btn">Search</button>
     </div>
-    
-</body>
+
+    <div>
+      <ol class="result"></ol>
+    </div>
+
+    <script>
+      var index = new FlexSearch.Index("performance");
+      let data = [];
+      async function loadData() {
+        let resp = await fetch("/data.json");
+        let json = await resp.json();
+        let i = 0;
+        json.definitions.forEach((elem) => {
+          if (elem.data === undefined) {
+            return;
+          }
+          if (elem.data.label !== undefined) {
+            i++;
+            index.add(elem.data.label, elem.data.label);
+          }
+          if (elem.data.name !== undefined) {
+            i++;
+            index.add(elem.data.name, elem.data.name);
+          }
+        });
+      }
+      loadData();
+
+      const search = document.querySelector(".search");
+      search.addEventListener("input", (e) => {
+        console.log(e.target.value);
+        const res = index.search(e.target.value);
+        console.log(res);
+        const resOl = document.querySelector(".result");
+        resOl.innerHTML = "";
+        res.forEach((elem) => {
+          resOl.innerHTML += `<li> ${elem}1 </li>`;
+        });
+      });
+    </script>
+  </body>
 </html>
